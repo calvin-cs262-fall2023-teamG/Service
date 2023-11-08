@@ -24,7 +24,7 @@
 
 // Set up the database connection.
 
-const pgp = require('pg-promise')();
+const pgp = require('pg-promise')(); 
 const db = pgp({
     host: process.env.DB_SERVER,
     port: process.env.DB_PORT,
