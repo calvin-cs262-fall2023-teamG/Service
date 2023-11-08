@@ -2,7 +2,7 @@
 
 This is the data service application for the [CS 262 ChapterCache project,](https://github.com/calvin-cs262-fall2023-teamG/Project) which is deployed here:
 
-- https://chaptercachecalvin.azurewebsites.net/
+- https://chaptercachecalvincs262.azurewebsites.net/
 
 It has the following data route URLs:
 
