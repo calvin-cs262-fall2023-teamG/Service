@@ -1,0 +1,6 @@
+{
+    "name": "Start on Heroku: server.js",
+    "description": "Data-based webservice for CS 262",
+    "repository": "https://github.com/calvin-cs262-fall2023-teamG/Service",
+    "image": "heroku/nodejs"
+  }
