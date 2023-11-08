@@ -52,7 +52,7 @@ router.delete('/users/:id', deleteUser);
 router.get("/books", readBooks);
 router.get("/users/:username", readBook);
 router.put("/users/:id", updateBook);
-router.post('/users', createBook);
+router.post('/books', createBook);
 router.delete('/users/:id', deleteBook);
 
 app.use(router);
@@ -155,7 +155,7 @@ function updateBook(req, res, next) {
 }
 
 function createBook(req, res, next) {
-    db.one('INSERT INTO Books(email, name) VALUES (${email}, ${name}) RETURNING id', req.body)
+    db.one('INSERT INTO Books(title, author, isbn, courseName) VALUES (${title}, ${author}, ${isbn}, ${coursename}) RETURNING id', req.body)
         .then(data => {
             res.send(data);
         })
