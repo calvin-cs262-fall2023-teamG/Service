@@ -82,6 +82,7 @@ function readHelloMessage(req, res) {
         })
 }
 
+
 function readUser(req, res, next) {
     db.oneOrNone('SELECT * FROM Users WHERE username=${username}', req.params)
         .then(data => {
