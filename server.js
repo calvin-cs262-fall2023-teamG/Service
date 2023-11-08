@@ -68,7 +68,7 @@ function returnDataOr404(res, data) {
 }
 
 function readHelloMessage(req, res) {
-    res.send('Hello, Welcome to Chapter Cache!!');
+    res.send('Hello, Welcome to Chapter Cache App!!');
 }
 
  function readUsers(req, res, next) {
