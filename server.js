@@ -95,7 +95,7 @@ function readUser(req, res, next) {
 }
 
 function updateUser(req, res, next) {
-    db.oneOrNone('UPDATE Users SET emailAddress=${emailAddress}, name=${name}, username=${username}, passwordHash = ${asswordHash} WHERE ID=${ID} RETURNING id', req.body)
+    db.oneOrNone('UPDATE Users SET emailAddress=${emailAddress}, name=${name}, username=${username}, passwordHash = ${passwordHash} WHERE ID=${ID} RETURNING id', req.body)
         .then(data => {
             returnDataOr404(res, data);
         })
