@@ -105,7 +105,7 @@ function updateUser(req, res, next) {
 }
 
 function createUser(req, res, next) {
-    db.one('INSERT INTO Users(name, emailAddress, username, password) VALUES ( ${name}, ${email}, $(username), $(password)) RETURNING id', req.body)
+    db.one('INSERT INTO Users(ID, name, emailAddress, username, passwordHash) VALUES ( ${ID}, ${name}, ${email}, $(username), $(passwordHash)) RETURNING id', req.body)
         .then(data => {
             res.send(data);
         })
