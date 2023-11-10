@@ -20,7 +20,7 @@ CREATE TABLE Books (
                         title varchar(100),
                         author varchar(100),
                         isbn varchar(25),
-                        price integer,
+                        price varchar(20),
                         courseName varchar(25),
                         date_sold date,
                         userID varchar(100) REFERENCES Users(ID),
