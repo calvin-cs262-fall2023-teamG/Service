@@ -95,7 +95,7 @@ function readUser(req, res, next) {
 }
 
 function updateUser(req, res, next) {
-    db.oneOrNone('UPDATE Users SET ID=${ID}, emailAddress=${emailAddress}, name=${name}, username=${username}, passwordHash = ${passwordHash} WHERE ID=${ID} RETURNING id', req.body)
+    db.oneOrNone('UPDATE Users SET ID = ${ID}, emailAddress=${emailAddress}, name=${name}, username=${username}, passwordHash = ${passwordHash} WHERE ID=${ID} RETURNING id', req.body)
         .then(data => {
             returnDataOr404(res, data);
         })
@@ -155,7 +155,7 @@ function updateBook(req, res, next) {
 }
 
 function createBook(req, res, next) {
-    db.one('INSERT INTO Books(ID, title, author, isbn, courseName price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${price}) RETURNING id', req.body)
+    db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}) RETURNING id', req.body)
         .then(data => {
             res.send(data);
         })
