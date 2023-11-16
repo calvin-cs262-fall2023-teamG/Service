@@ -54,7 +54,7 @@ router.get("/users/:username", readBook);
 router.put("/users/:id", updateBook);
 router.post('/books', createBook);
 router.delete('/users/:id', deleteBook);
-router.put("/books/:id", updateBook);
+router.put("/books/update/:id", updateBook);
 
 app.use(router);
 app.listen(port, () => console.log(`Listening on port ${port}`));
