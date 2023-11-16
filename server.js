@@ -145,7 +145,7 @@ function readBook(req, res, next) {
 }
 
 function updateBook(req, res, next) {
-    db.oneOrNone('UPDATE Books SET email=${body.email}, name=${body.name} WHERE id=${params.id} RETURNING id', req)
+    db.oneOrNone('UPDATE Books SET title=${title}, author=${author}, isbn=${isbn}, price=${price}, courseName=${courseName}, userID=${userID} WHERE id=${id} RETURNING id', req.body)
         .then(data => {
             returnDataOr404(res, data);
         })
@@ -153,6 +153,7 @@ function updateBook(req, res, next) {
             next(err);
         });
 }
+
 
 function createBook(req, res, next) {
     db.one('INSERT INTO Books(ID, title, author, isbn, price, courseName, userID) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${price}, ${coursename}, ${userID}) RETURNING id', req.body)
