@@ -146,17 +146,23 @@ function readBook(req, res, next) {
 }
 
 function updateBook(req, res, next) {
+    console.log('Updating book with ID:', req.params.id);
+    console.log('Request body:', req.body);
+
     db.oneOrNone('UPDATE Books SET title=${title}, author=${author}, isbn=${isbn}, price=${price}, courseName=${courseName}, userID=${userID} WHERE id=${id} RETURNING id', {
         ...req.body,
-        id: req.params.id, // Use req.params.id to get the book ID from the URL
+        id: req.params.id,
     })
     .then(data => {
+        console.log('Book updated successfully:', data);
         returnDataOr404(res, data);
     })
     .catch(err => {
+        console.error('Error updating book:', err);
         next(err);
     });
 }
+
 
 
 
