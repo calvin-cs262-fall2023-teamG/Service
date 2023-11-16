@@ -149,7 +149,7 @@ function updateBook(req, res, next) {
     console.log('Updating book with ID:', req.params.id);
     console.log('Request body:', req.body);
 
-    db.oneOrNone('UPDATE Books SET title=${title}, author=${author}, isbn=${isbn}, price=${price}, coursename=${coursename}, userID=${userID} WHERE id=${id} RETURNING id', {
+    db.oneOrNone('UPDATE Books SET title=${title}, author=${author}, isbn=${isbn}, price=${price}, coursename=${coursename}, userid=${userid} WHERE id=${id} RETURNING id', {
         ...req.body,
         id: req.params.id,
     })
