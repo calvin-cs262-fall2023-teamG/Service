@@ -1,16 +1,17 @@
 module.exports = {
-  extends: ['universe/native', 'airbnb'],
   env: {
     browser: true,
     es2021: true,
-    commonjs: true,
   },
+  extends: 'airbnb',
   overrides: [
     {
       env: {
         node: true,
       },
-      files: ['.eslintrc.{js,cjs}'],
+      files: [
+        '.eslintrc.{js,cjs}',
+      ],
       parserOptions: {
         sourceType: 'script',
       },
@@ -21,8 +22,5 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    'linebreak-style': 0,
-    'no-console': ['error', { allow: ['error'] }],
-    'prettier/prettier': 'off',
   },
 };
