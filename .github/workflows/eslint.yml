@@ -1,28 +1,28 @@
-name: eslint
+name: ci
 
 on: 
   push:
     branches:
       - main
-    workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   eslint:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: check out repo
         uses: actions/checkout@v2
 
       - name: set up node
         uses: actions/setup-node@v3
         with:
-            node-version: '18.x'
+            node-version: 20
 
       - name: npm install
-        run: npm install
+        run: npm ci
 
       - name: eslint
         run: npm run lint
