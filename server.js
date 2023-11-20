@@ -58,6 +58,7 @@ router.get('/users/:username', readBook);
 router.put('/users/:id', updateBook);
 router.post('/books', createBook);
 router.delete('/users/:id', deleteBook);
+router.put("/books/update/:id", updateBook);
 
 app.use(router);
 app.listen(port, () => console.log(`Listening on port ${port}`));
@@ -156,6 +157,9 @@ function updateBook(req, res, next) {
     });
 }
 
+
+
+
 function createBook(req, res, next) {
   db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}) RETURNING id', req.body)
     .then((data) => {
@@ -163,7 +167,7 @@ function createBook(req, res, next) {
     })
     .catch((err) => {
       next(err);
-    });
+    })
 }
 
 function deleteBook(req, res, next) {
