@@ -127,7 +127,7 @@ function deleteUser(req, res, next) {
 }
 
 function readBooks(req, res, next) {
-  db.many('SELECT b.ID, b.title, b.author, b.isbn, b.price, b.courseName, b.date_sold, b.userID, b.front_picture, b.back_picture, u.name, u.emailAddress FROM Books b, Users u  WHERE u.ID = b.userID')
+  db.many('SELECT b.ID, b.title, b.author, b.isbn, b.price, b.courseName, b.condition, b.date_sold, b.userID, b.front_picture, b.back_picture, u.name, u.emailAddress FROM Books b, Users u  WHERE u.ID = b.userID')
     .then((data) => {
       res.send(data);
     })
@@ -137,7 +137,7 @@ function readBooks(req, res, next) {
 }
 
 function readBook(req, res, next) {
-  db.oneOrNone('SELECT b.ID, b.title, b.author, b.isbn, b.price, b.courseName, b.date_sold, b.userID, b.front_picture, b.back_picture, u.name, u.emailAddress FROM Books b, Users u  WHERE u.ID = b.userID and b.id=${id}', req.params)
+  db.oneOrNone('SELECT b.ID, b.title, b.author, b.isbn, b.price, b.courseName, b.condition, b.date_sold, b.userID, b.front_picture, b.back_picture, u.name, u.emailAddress FROM Books b, Users u  WHERE u.ID = b.userID and b.id=${id}', req.params)
     .then((data) => {
       returnDataOr404(res, data);
     })
