@@ -3,7 +3,7 @@
 /* eslint-disable no-template-curly-in-string */
 /**
  * This module implements a REST-inspired webservice for ChapterCache
- * The database is hosted on ElephantSQL.
+ * The database is hosted on ElephantSQL .
  *
  * Currently, the service supports the user and books table.
  *
@@ -158,7 +158,7 @@ function updateBook(req, res, next) {
 }
 
 function createBook(req, res, next) {
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}) RETURNING id', req.body)
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}) RETURNING id', req.body)
     .then((data) => {
       res.send(data);
     })
