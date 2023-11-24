@@ -4,5 +4,5 @@
         ".vscode{,/**}"
     ],
     "appService.defaultWebAppToDeploy": "/subscriptions/e690f794-e316-4d8d-bf05-c9964dd971fe/resourceGroups/ChapterCachers-rg/providers/Microsoft.Web/sites/ChapterCachers",
-    "appService.deploySubpath": "."
+    "appService.deploySubpath": ".",
 }
