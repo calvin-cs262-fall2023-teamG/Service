@@ -3,7 +3,7 @@
 /* eslint-disable no-template-curly-in-string */
 /**
  * This module implements a REST-inspired webservice for ChapterCache
- * The database is hosted on ElephantSQL.
+ * The database is hosted on ElephantSQL .
  *
  * Currently, the service supports the user and books table.
  *
