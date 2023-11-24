@@ -158,7 +158,7 @@ function updateBook(req, res, next) {
 }
 
 function createBook(req, res, next) {
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}) RETURNING id', req.body)
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}) RETURNING id', req.body)
     .then((data) => {
       res.send(data);
     })
