@@ -54,10 +54,10 @@ router.post('/users', createUser);
 router.delete('/users/:id', deleteUser);
 
 router.get('/books', readBooks);
-router.get('/users/:username', readBook);
+router.get('/books/:title', readBook);
 router.put('/books/:id', updateBook);
 router.post('/books', createBook);
-router.delete('/users/:id', deleteBook);
+router.delete('/books/:id', deleteBook);
 
 app.use(router);
 app.listen(port, () => console.log(`Listening on port ${port}`));
