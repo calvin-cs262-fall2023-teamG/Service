@@ -148,7 +148,7 @@ function readBook(req, res, next) {
 }
 
 function updateBook(req, res, next) {
-  db.oneOrNone('UPDATE Books SET email=${body.email}, name=${body.name} WHERE id=${params.id} RETURNING id', req)
+  db.oneOrNone('UPDATE Books SET ID = ${id}, title = ${title}, author = ${author}, isbn = ${isbn}, coursename = ${coursename}, userID = ${userID}, price = ${price}) WHERE id=${params.id} RETURNING id', req.body)
     .then((data) => {
       returnDataOr404(res, data);
     })
