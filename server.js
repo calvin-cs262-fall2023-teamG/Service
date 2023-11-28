@@ -26,8 +26,36 @@
  */
 
 // Set up the database connection.
+const { BlobServiceClient } = require('@azure/storage-blob');
+const fs = require('fs');
+
+const containerName = 'image';
+const blobService = new BlobServiceClient(
+  'https://calvinchaptercache.blob.core.windows.net/?sp=racwdli&st=2023-11-28T01:41:02Z&se=2023-11-28T09:41:02Z&spr=https&sv=2022-11-02&sr=c&sig=KBcMcpdQia7lRa45wenJjGzoBtcMCt93Y7WaWULXjv8%3D',
+);
 
 const pgp = require('pg-promise')();
+
+async function handleImageUpload(imagePath) {
+  const imageName = 'image_m.jpg'; // Generate a unique image name
+  try {
+    const buffer = fs.readFileSync(imagePath);
+
+    const containerClient = blobService.getContainerClient(containerName);
+    const blockBlobClient = containerClient.getBlockBlobClient(imageName);
+
+    const options = { blobHTTPHeaders: { blobContentType: 'application/octet-stream' } };
+
+    console.log('Uploading image blob...');
+    const uploadResponse = await blockBlobClient.uploadData(buffer, options);
+
+    console.log('Blob uploaded successfully:', uploadResponse);
+    return blockBlobClient.url;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    return null;
+  }
+}
 
 const db = pgp({
   host: process.env.DB_SERVER,
@@ -157,7 +185,13 @@ function updateBook(req, res, next) {
 }
 
 function createBook(req, res, next) {
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}) RETURNING id', req.body)
+  const file = './flower.jpg';
+  handleImageUpload(file).then((result) => {
+    console.log('Uploaded image URL:', result);
+  }).catch((error) => {
+    console.error('Upload failed:', error);
+  });
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}) RETURNING id', req.body)
     .then((data) => {
       res.send(data);
     })
