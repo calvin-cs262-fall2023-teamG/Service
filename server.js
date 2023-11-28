@@ -36,11 +36,9 @@ const blobService = new BlobServiceClient(
 
 const pgp = require('pg-promise')();
 
-async function handleImageUpload(imagePath) {
-  const imageName = 'image_m.jpg'; // Generate a unique image name
+async function handleImageUpload(buffer) {
+  const imageName = 'image_my.jpg'; // Generate a unique image name
   try {
-    const buffer = fs.readFileSync(imagePath);
-
     const containerClient = blobService.getContainerClient(containerName);
     const blockBlobClient = containerClient.getBlockBlobClient(imageName);
 
@@ -184,13 +182,15 @@ function updateBook(req, res, next) {
     });
 }
 
-function createBook(req, res, next) {
-  const file = './flower.jpg';
-  handleImageUpload(file).then((result) => {
-    console.log('Uploaded image URL:', result);
-  }).catch((error) => {
-    console.error('Upload failed:', error);
-  });
+async function createBook(req, res, next) {
+  const base64Data = Buffer.from(req.body.front_picture, 'base64');
+
+  const imageUrl = await handleImageUpload(base64Data);
+
+  console.log('Uploaded image URL:', imageUrl);
+
+  // Update req.body with the image URL
+  req.body.front_picture = imageUrl;
   db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}) RETURNING id', req.body)
     .then((data) => {
       res.send(data);
