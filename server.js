@@ -27,7 +27,6 @@
 
 // Set up the database connection.
 const { BlobServiceClient } = require('@azure/storage-blob');
-const fs = require('fs');
 
 const containerName = 'image';
 const blobService = new BlobServiceClient(
@@ -42,7 +41,7 @@ async function handleImageUpload(buffer) {
     const containerClient = blobService.getContainerClient(containerName);
     const blockBlobClient = containerClient.getBlockBlobClient(imageName);
 
-    const options = { blobHTTPHeaders: { blobContentType: 'application/octet-stream' } };
+    const options = { blobHTTPHeaders: { blobContentType: 'image/jpeg' } };
 
     console.log('Uploading image blob...');
     const uploadResponse = await blockBlobClient.uploadData(buffer, options);
@@ -70,7 +69,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 const router = express.Router();
-router.use(express.json({ limit: '10mb'}));
+router.use(express.json({ limit: '10mb' }));
 
 router.get('/', readHelloMessage);
 router.get('/users', readUsers);
