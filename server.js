@@ -191,7 +191,7 @@ async function createBook(req, res, next) {
   // // Update req.body with the image URL
   // req.body.front_picture = imageUrl;
   //db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}) RETURNING id', req.body)
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}) RETURNING id', req.body)
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, condition) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${condition}) RETURNING id', req.body)
     .then((data) => {
       res.send(data);
     })
