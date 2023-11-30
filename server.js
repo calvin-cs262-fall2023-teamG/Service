@@ -182,15 +182,16 @@ function updateBook(req, res, next) {
 }
 
 async function createBook(req, res, next) {
-  const base64Data = Buffer.from(req.body.front_picture, 'base64');
+  // const base64Data = Buffer.from(req.body.front_picture, 'base64');
 
-  const imageUrl = await handleImageUpload(base64Data);
+  // const imageUrl = await handleImageUpload(base64Data);
 
-  console.log('Uploaded image URL:', imageUrl);
+  // console.log('Uploaded image URL:', imageUrl);
 
-  // Update req.body with the image URL
-  req.body.front_picture = imageUrl;
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}) RETURNING id', req.body)
+  // // Update req.body with the image URL
+  // req.body.front_picture = imageUrl;
+  //db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}) RETURNING id', req.body)
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}) RETURNING id', req.body)
     .then((data) => {
       res.send(data);
     })
