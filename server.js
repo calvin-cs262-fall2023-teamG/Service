@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable prefer-template */
 /* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-template-curly-in-string */
@@ -27,32 +29,36 @@
 
 // Set up the database connection.
 const { BlobServiceClient } = require('@azure/storage-blob');
-// const { DefaultAzureCredential } = require('@azure/identity');
-// const { v1: uuidv1 } = require('uuid');
+const { DefaultAzureCredential } = require('@azure/identity');
+const { v1: uuidv1 } = require('uuid');
 
-// const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-// if (!accountName) throw Error('Azure Storage accountName not found');
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+if (!accountName) throw Error('Azure Storage accountName not found');
 
-const containerName = 'image';
 const blobService = new BlobServiceClient(
-  'https://calvinchaptercache.blob.core.windows.net/?sp=racwdli&st=2023-11-28T01:41:02Z&se=2023-11-28T09:41:02Z&spr=https&sv=2022-11-02&sr=c&sig=KBcMcpdQia7lRa45wenJjGzoBtcMCt93Y7WaWULXjv8%3D',
+  `https://${accountName}.blob.core.windows.net`,
+  new DefaultAzureCredential(),
 );
 
 const pgp = require('pg-promise')();
 
-async function handleImageUpload(buffer) {
-  const imageName = 'image_my.jpg'; // Generate a unique image name
+async function handleImageUpload(data) {
   try {
-    const containerClient = blobService.getContainerClient(containerName);
-    const blockBlobClient = containerClient.getBlockBlobClient(imageName);
+    const containerName = uuidv1();
 
-    // const options = { blobHTTPHeaders: { blobContentType: 'image/jpeg' } };
+    const containerClient = blobService.getContainerClient(containerName);
+    await containerClient.create();
+
+    const blobName = uuidv1() + '.txt';
+
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     console.log('Uploading image blob...');
-    const uploadResponse = await blockBlobClient.upload(buffer, buffer.length);
+    const uploadResponse = await blockBlobClient.uploadData(data, data.length);
 
     console.log('Blob uploaded successfully:', uploadResponse);
-    return blockBlobClient.url;
+    return [containerName, blobName];
+    //return blockBlobClient.url;
   } catch (error) {
     console.error('Error uploading image:', error);
     return null;
@@ -74,7 +80,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 const router = express.Router();
-router.use(express.json({ limit: '15mb' }));
+router.use(express.json({ limit: '10mb' }));
 
 router.get('/', readHelloMessage);
 router.get('/users', readUsers);
@@ -187,16 +193,20 @@ function updateBook(req, res, next) {
 }
 
 async function createBook(req, res, next) {
-  if (req.body.front_picture) {
-    //handleImageUpload(req.body.front_picture);
-    const imageUrl = await handleImageUpload(req.body.front_picture);
-  }
+  // const base64Data = Buffer.from(req.body.front_picture, 'base64');
+
+  // const imageUrl = await handleImageUpload(base64Data);
+
   // console.log('Uploaded image URL:', imageUrl);
 
-  // Update req.body with the image URL
-  req.body.front_picture = imageUrl;
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}') RETURNING id', req.body)
-  // db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}) RETURNING id', req.body)
+  // // Update req.body with the image URL
+  // req.body.front_picture = imageUrl;
+  //const blockBlobClient = '../../assets/placeholder.jpg';
+  const image = (req.body.front_picture) ? await handleImageUpload(req.body.front_picture) : [null, null];
+  console.log(image);
+
+  // db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}) RETURNING id', req.body)
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, condition, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${condition}, \'' + image[1] + '\') RETURNING id', req.body)
     .then((data) => {
       res.send(data);
     })
