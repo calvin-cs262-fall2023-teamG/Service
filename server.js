@@ -27,11 +27,11 @@
 
 // Set up the database connection.
 const { BlobServiceClient } = require('@azure/storage-blob');
-const { DefaultAzureCredential } = require('@azure/identity');
-const { v1: uuidv1 } = require('uuid');
+// const { DefaultAzureCredential } = require('@azure/identity');
+// const { v1: uuidv1 } = require('uuid');
 
-const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-if (!accountName) throw Error('Azure Storage accountName not found');
+// const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+// if (!accountName) throw Error('Azure Storage accountName not found');
 
 const containerName = 'image';
 const blobService = new BlobServiceClient(
@@ -194,8 +194,8 @@ async function createBook(req, res, next) {
   // console.log('Uploaded image URL:', imageUrl);
 
   // Update req.body with the image URL
-  // req.body.front_picture = imageUrl;
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, \'HELLO\') RETURNING id', req.body)
+  req.body.front_picture = imageUrl;
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}') RETURNING id', req.body)
   // db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}) RETURNING id', req.body)
     .then((data) => {
       res.send(data);
