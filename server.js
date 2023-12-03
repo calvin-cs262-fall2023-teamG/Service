@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-plusplus */
 /* eslint-disable max-len */
 /* eslint-disable prefer-template */
 /* eslint-disable no-console */
@@ -30,10 +32,10 @@
 // Set up the database connection.
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { DefaultAzureCredential } = require('@azure/identity');
-const { v1: uuidv1 } = require('uuid');
 
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 if (!accountName) throw Error('Azure Storage accountName not found');
+const containerName = 'image';
 
 const blobService = new BlobServiceClient(
   `https://${accountName}.blob.core.windows.net`,
@@ -42,29 +44,45 @@ const blobService = new BlobServiceClient(
 
 const pgp = require('pg-promise')();
 
-async function handleImageUpload(data) {
+async function handleImageUpload(id, data) {
   try {
-    const containerName = uuidv1();
-
     const containerClient = blobService.getContainerClient(containerName);
-    await containerClient.create();
-
-    const blobName = uuidv1() + '.txt';
+    const blobName = id + '.txt';
 
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     console.log('Uploading image blob...');
-    const uploadResponse = await blockBlobClient.uploadData(data, data.length);
+    const uploadResponse = await blockBlobClient.upload(data, data.length);
 
     console.log('Blob uploaded successfully:', uploadResponse);
-    return [containerName, blobName];
-    //return blockBlobClient.url;
+    return blobName;
   } catch (error) {
     console.error('Error uploading image:', error);
     return null;
   }
 }
 
+async function handleImageDownload(blobName) {
+  try {
+    const containerClient = blobService.getContainerClient(containerName);
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    const downloadBlockBlobResponse = await blockBlobClient.download(0);
+    return await streamToText(downloadBlockBlobResponse.readableStreamBody);
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+async function streamToText(readable) {
+  readable.setEncoding('utf8');
+  let data = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const chunk of readable) {
+    data += chunk;
+  }
+  return data;
+}
 const db = pgp({
   host: process.env.DB_SERVER,
   port: process.env.DB_PORT,
@@ -80,7 +98,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 const router = express.Router();
-router.use(express.json({ limit: '10mb' }));
+router.use(express.json({ limit: '50mb' }));
 
 router.get('/', readHelloMessage);
 router.get('/users', readUsers);
@@ -164,8 +182,17 @@ function deleteUser(req, res, next) {
 
 function readBooks(req, res, next) {
   db.many('SELECT b.ID, b.title, b.author, b.isbn, b.price, b.courseName, b.condition, b.date_sold, b.userID, b.front_picture, b.back_picture, u.name, u.emailAddress FROM Books b, Users u  WHERE u.ID = b.userID')
-    .then((data) => {
-      res.send(data);
+    .then(async (data) => {
+      const returnData = data;
+      for (let i = 0; i < returnData.length; i++) {
+      // TODO: currently a string 'null' b/c of how create query is written
+        if (returnData[i].front_picture !== 'null' && returnData[i].front_picture !== null && returnData[i].back_picture !== 'null' && returnData[i].back_picture !== null) {
+        // eslint-disable-next-line no-await-in-loop
+          returnData[i].front_picture = await handleImageDownload(returnData[i].front_picture);
+          returnData[i].back_picture = await handleImageDownload(returnData[i].back_picture);
+        }
+      }
+      returnDataOr404(res, returnData);
     })
     .catch((err) => {
       next(err);
@@ -193,20 +220,10 @@ function updateBook(req, res, next) {
 }
 
 async function createBook(req, res, next) {
-  // const base64Data = Buffer.from(req.body.front_picture, 'base64');
+  const frontPicture = (req.body.front_picture) ? await handleImageUpload(req.body.ID + '_front', req.body.front_picture) : [null, null];
+  const backPicture = (req.body.back_picture) ? await handleImageUpload(req.body.ID + '_back', req.body.back_picture) : [null, null];
 
-  // const imageUrl = await handleImageUpload(base64Data);
-
-  // console.log('Uploaded image URL:', imageUrl);
-
-  // // Update req.body with the image URL
-  // req.body.front_picture = imageUrl;
-  //const blockBlobClient = '../../assets/placeholder.jpg';
-  const image = (req.body.front_picture) ? await handleImageUpload(req.body.front_picture) : [null, null];
-  console.log(image);
-
-  // db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${front_picture}) RETURNING id', req.body)
-  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, condition, front_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${condition}, \'' + image[1] + '\') RETURNING id', req.body)
+  db.one('INSERT INTO Books(ID, title, author, isbn, courseName, userID, price, condition, front_picture, back_picture) VALUES (${ID}, ${title}, ${author}, ${isbn}, ${coursename}, ${userID}, ${price}, ${condition}, \'' + frontPicture + '\', \'' + backPicture + '\') RETURNING id', req.body)
     .then((data) => {
       res.send(data);
     })
