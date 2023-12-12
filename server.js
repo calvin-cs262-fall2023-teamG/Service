@@ -12,9 +12,7 @@
  * Currently, the service supports the user and books table.
  *
  * To guard against SQL injection attacks, this code uses pg-promise's built-in
- * variable escaping. This prevents a client from issuing this URL:
- *     https://cs262-monopoly-service.herokuapp.com/players/1%3BDELETE%20FROM%20PlayerGame%3BDELETE%20FROM%20Player
- * which would delete records in the PlayerGame and then the Player tables.
+ * variable escaping.
  * In particular, we don't use JS template strings because it doesn't filter
  * client-supplied values properly.
  * TODO: Consider using Prepared Statements.
@@ -37,6 +35,7 @@ const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 if (!accountName) throw Error('Azure Storage accountName not found');
 const containerName = 'image';
 
+// It gets Azure Credential from the DefaultAzureCredential() and sets up a new blob service client
 const blobService = new BlobServiceClient(
   `https://${accountName}.blob.core.windows.net`,
   new DefaultAzureCredential(),
@@ -44,6 +43,13 @@ const blobService = new BlobServiceClient(
 
 const pgp = require('pg-promise')();
 
+/*
+ * handleImageUpload(id, data)
+ * Creates a blob in the image container in the storage account
+ * @params : data - byte64 data that should be received from the client
+ * @params : id - id of the book to name the pictures accordingly
+ * @returns blobName that was created
+ */
 async function handleImageUpload(id, data) {
   try {
     const containerClient = blobService.getContainerClient(containerName);
@@ -62,6 +68,11 @@ async function handleImageUpload(id, data) {
   }
 }
 
+/**
+ * The user to download an image from the storage account
+ * @param {} blobName the upload location/url. Should be the same one used in uploadImage.
+ * @returns byte64 image data to be sent to the client
+ */
 async function handleImageDownload(blobName) {
   try {
     const containerClient = blobService.getContainerClient(containerName);
@@ -74,6 +85,8 @@ async function handleImageDownload(blobName) {
   }
 }
 
+// Convert stream to text
+// taken from storage account tutorial (https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-nodejs?tabs=managed-identity%2Croles-azure-portal%2Csign-in-azure-cli)
 async function streamToText(readable) {
   readable.setEncoding('utf8');
   let data = '';
@@ -83,6 +96,8 @@ async function streamToText(readable) {
   }
   return data;
 }
+
+//
 const db = pgp({
   host: process.env.DB_SERVER,
   port: process.env.DB_PORT,
@@ -100,7 +115,6 @@ const port = process.env.PORT || 3000;
 const router = express.Router();
 
 router.use(express.json({ limit: '50mb' }));
-
 router.get('/', readHelloMessage);
 router.get('/users', readUsers);
 router.get('/users/:username', readUser);
@@ -118,7 +132,6 @@ app.use(router);
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 // Implement the CRUD operations.
-
 function returnDataOr404(res, data) {
   if (data == null) {
     res.sendStatus(404);
