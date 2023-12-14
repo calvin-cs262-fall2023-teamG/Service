@@ -1,6 +1,6 @@
 # ChapterCache Webservice
 
-This is the data service application for the [CS 262 ChapterCache project,](https://github.com/calvin-cs262-fall2023-teamG/Project) which is deployed here:
+This is the data service application for the [CS 262 ChapterCache project,](https://github.com/calvin-cs262-fall2023-teamG/Project) that runs the [client](https://github.com/calvin-cs262-fall2023-teamG/Client) which is deployed here:
 
 - https://chaptercachecalvincs262.azurewebsites.net/
 
