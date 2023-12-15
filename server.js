@@ -123,7 +123,6 @@ router.post('/users', createUser);
 router.delete('/users/:id', deleteUser);
 
 router.get('/books', readBooks);
-router.get('/books/:title', readBook);
 router.put('/books/:id', updateBook);
 router.post('/books', createBook);
 router.delete('/books/:id', deleteBook);
@@ -207,16 +206,6 @@ function readBooks(req, res, next) {
         }
       }
       returnDataOr404(res, returnData);
-    })
-    .catch((err) => {
-      next(err);
-    });
-}
-
-function readBook(req, res, next) {
-  db.oneOrNone('SELECT b.ID, b.title, b.author, b.isbn, b.price, b.courseName, b.condition, b.date_sold, b.userID, b.front_picture, b.back_picture, u.name, u.emailAddress FROM Books b, Users u  WHERE u.ID = b.userID and b.id=${id}', req.params)
-    .then((data) => {
-      returnDataOr404(res, data);
     })
     .catch((err) => {
       next(err);
